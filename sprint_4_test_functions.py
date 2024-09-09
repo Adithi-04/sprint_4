@@ -29,12 +29,12 @@ COPYRIGHT: © M/s CARE2DATA 2024. All Rights Reserved.
 """
 
 import os
-import re
 import logging
 import pytest
 from user_Interface import selected_folder_path
 from data_extraction import extract_column_headers
-from data_extraction import debug_print
+from user_Interface import *
+from data_extraction import *
 
 # Configure the logger
 logger = logging.getLogger(__name__)
@@ -52,6 +52,10 @@ file_handler.setFormatter(formatter)
 # Add the handler to the logger
 logger.addHandler(file_handler)
 
+# Ensure pytest doesn't capture log output
+@pytest.fixture(autouse=True)
+def disable_capture_log(caplog):
+    caplog.set_level(logging.DEBUG)
 
 """
 SRS REQUIREMENT ID: KEX0002.3.3
@@ -62,151 +66,128 @@ TEST SCENARIO: "The system should have the ability to extract Tables even if the
 #positive test case to extract tables and listings for no row/column header
 
 
-def no_row_header_positive(selected_folder_path):
-    valid_files = []
-    logging.info("Starting test case for empty column headers")
-    
-    # Process each RTF file in the selected folder
-    for file_name in os.listdir(selected_folder_path):
-        file_path = os.path.join(selected_folder_path, file_name)
+def test_no_row_header_positive():
+    if __name__ == "__main__":
+        logger.info("Starting test case for empty column headers")
+        # Process each RTF file in the selected folder
+        for file_name in os.listdir(selected_folder_path):
+            file_path = os.path.join(selected_folder_path, file_name)
         
-        if os.path.isfile(file_path) and file_path.lower().endswith('.rtf'):
-            try:
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    rtf_content = file.read()
-                    logging.info(f"Processing file: {file_name}")
+            if os.path.isfile(file_path) and file_path.lower().endswith('.rtf'):
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as file:
+                        rtf_content = file.read()
+                        logger.info(f"Processing file: {file_name}")
                     
-                    # Extract column headers using the extract_column_headers function
-                    headers_data = extract_column_headers(rtf_content)
+                        # Extract column headers using the extract_column_headers function
+                        headers_data = extract_column_headers(rtf_content)
                     
-                    # Log based on the result of the header extraction
-                    if headers_data['data'] == []:
-                        logging.info(f"Empty column headers found in file: {file_name}")
-                        debug_print(f"Empty column headers found in file: {file_name}")
-                    else:
-                        logging.info(f"Column headers extracted in file: {file_name}")
-                        debug_print(f"Column headers extracted in file: {file_name}")
+                        # Log based on the result of the header extraction
+                        if headers_data['data'] == []:
+                            logger.info(f"Empty column headers found in file: {file_name}")
+                            logger.debug(f"Empty column headers found in file: {file_name}")
+                        else:
+                            logger.info(f"Column headers extracted in file: {file_name}")
+                            logger.debug(f"Column headers extracted in file: {file_name}")
                     
-                    valid_files.append(file_name)  # Add valid file to the list
+                except Exception as e:
+                    logger.info(f"Error processing file {file_name}: {e}")
+                    logger.debug(f"Error processing file {file_name}: {e}")
 
-            except Exception as e:
-                logging.error(f"Error processing file {file_name}: {e}")
-                debug_print(f"Error processing file {file_name}: {e}")
-
-    logging.info("Test case for empty column headers completed")
-    return valid_files
 
 #negative test case to extract tables and listings for no row/column header
-def no_row_header_negative(selected_folder_path):
-    invalid_files = []
-    logging.info("Starting negative test case for missing/invalid column headers")
-    
-    # Process each RTF file in the selected folder
-    for file_name in os.listdir(selected_folder_path):
-        file_path = os.path.join(selected_folder_path, file_name)
+def test_no_row_header_negative():
+    if __name__ == "__main__":
+        logger.info("Starting negative test case for missing/invalid column headers")
+        # Process each RTF file in the selected folder
+        for file_name in os.listdir(selected_folder_path):
+            file_path = os.path.join(selected_folder_path, file_name)
         
-        if os.path.isfile(file_path) and file_path.lower().endswith('.rtf'):
-            try:
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    rtf_content = file.read()
-                    logging.info(f"Processing file: {file_name}")
+            if os.path.isfile(file_path) and file_path.lower().endswith('.rtf'):
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as file:
+                        rtf_content = file.read()
+                        logger.info(f"Processing file: {file_name}")
                     
-                    # Extract column headers using the original extract_column_headers function
-                    headers_data = extract_column_headers(rtf_content)
+                        # Extract column headers using the original extract_column_headers function
+                        headers_data = extract_column_headers(rtf_content)
                     
-                    # Log based on the result of the header extraction
-                    if headers_data['data'] == []:
-                        logging.warning(f"Column headers missing or invalid in file: {file_name}")
-                        debug_print(f"Column headers missing or invalid in file: {file_name}")
-                        invalid_files.append(file_name)  # Add invalid file to the list
-                    else:
-                        logging.error(f"Column headers extracted (negative test failed) in file: {file_name}")
-                        debug_print(f"Column headers extracted (negative test failed) in file: {file_name}")
+                        # Log based on the result of the header extraction
+                        if headers_data['data'] == []:
+                            logger.warning(f"Column headers missing or invalid in file: {file_name}")
+                            logger.debug(f"Column headers missing or invalid in file: {file_name}")
+                        else:
+                            logger.info(f"Column headers extracted (negative test failed) in file: {file_name}")
+                            logger.debug(f"Column headers extracted (negative test failed) in file: {file_name}")
                     
-            except Exception as e:
-                logging.error(f"Error processing file {file_name}: {e}")
-                debug_print(f"Error processing file {file_name}: {e}")
-                invalid_files.append(file_name)  # Add invalid file to the list
-
-    logging.info("Negative test case for missing/invalid column headers completed")
-    return invalid_files
+                except Exception as e:
+                    logger.error(f"Error processing file {file_name}: {e}")
+                    logger.debug(f"Error processing file {file_name}: {e}")
 
 
 #positive test case to extract tables and listings for null row/column header
-def no_null_column_header_positive(selected_folder_path):
-    valid_null_header_files = []
-    logging.info("Starting positive test case for valid column headers")
-    
-    # Process each RTF file in the selected folder
-    for file_name in os.listdir(selected_folder_path):
-        file_path = os.path.join(selected_folder_path, file_name)
-        
-        if os.path.isfile(file_path) and file_path.lower().endswith('.rtf'):
-            try:
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    rtf_content = file.read()
-                    logging.info(f"Processing file: {file_name}")
-                    
-                    # Extract column headers using the original extract_column_headers function
-                    headers_data = extract_column_headers(rtf_content)
-                    
-                    # Check for valid (non-null and non-empty) column headers
-                    if headers_data['data'] and all(header.strip() != "" for header in headers_data['data']):
-                        logging.info(f"Valid column headers found in file: {file_name}")
-                        debug_print(f"Valid column headers found in file: {file_name}")
-                        valid_null_header_files.append(file_name)  # Add valid file to the list
-                    else:
-                        logging.error(f"Null/Empty column headers detected (positive test failed) in file: {file_name}")
-                        debug_print(f"Null/Empty column headers detected (positive test failed) in file: {file_name}")
-                    
-            except Exception as e:
-                logging.error(f"Error processing file {file_name}: {e}")
-                debug_print(f"Error processing file {file_name}: {e}")
+def test_no_null_column_header_positive():
+    if __name__ == "__main__":
 
-    logging.info("Positive test case for valid column headers completed")
-    return valid_null_header_files
+    # Process each RTF file in the selected folder
+        for file_name in os.listdir(selected_folder_path):
+            file_path = os.path.join(selected_folder_path, file_name)
+        
+            if os.path.isfile(file_path) and file_path.lower().endswith('.rtf'):
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as file:
+                        rtf_content = file.read()
+                        logger.info(f"Processing file: {file_name}")
+                    
+                        # Extract column headers using the original extract_column_headers function
+                        headers_data = extract_column_headers(rtf_content)
+                    
+                        # Check for valid (non-null and non-empty) column headers
+                        if headers_data['data'] and all(header.strip() != "" for header in headers_data['data']):
+                            logger.info(f"Valid column headers found in file: {file_name}")
+                            debug_print(f"Valid column headers found in file: {file_name}")
+                        else:
+                            logger.error(f"Null/Empty column headers detected (positive test failed) in file: {file_name}")
+                            debug_print(f"Null/Empty column headers detected (positive test failed) in file: {file_name}")
+                    
+                except Exception as e:
+                    logger.error(f"Error processing file {file_name}: {e}")
+                    logger.debug(f"Error processing file {file_name}: {e}")
+
 
 
 #negative test case to extract tables and listings for null row/column header
 
-def no_null_column_header_negative(selected_folder_path):
-    invalid_null_header_files = []
-    logging.info("Starting negative test case for null column headers")
-    
-    # Process each RTF file in the selected folder
-    for file_name in os.listdir(selected_folder_path):
-        file_path = os.path.join(selected_folder_path, file_name)
+def test_no_null_column_header_negative():
+    # Ensure that this script is being run directly, not imported
+    if __name__ == "__main__":    
+        # Process each RTF file in the selected folder
+        for file_name in os.listdir(selected_folder_path):
+            file_path = os.path.join(selected_folder_path, file_name)
         
-        if os.path.isfile(file_path) and file_path.lower().endswith('.rtf'):
-            try:
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    rtf_content = file.read()
-                    logging.info(f"Processing file: {file_name}")
+            if os.path.isfile(file_path) and file_path.lower().endswith('.rtf'):
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as file:
+                        rtf_content = file.read()
+                        logger.info(f"Processing file: {file_name}")
                     
-                    # Extract column headers using the original extract_column_headers function
-                    headers_data = extract_column_headers(rtf_content)
+                     # Extract column headers using the original extract_column_headers function
+                        headers_data = extract_column_headers(rtf_content)
                     
                     # Check for null/empty column headers
                     if not headers_data['data'] or all(header.strip() == "" for header in headers_data['data']):
-                        logging.warning(f"Null/Empty column headers detected in file: {file_name}")
-                        debug_print(f"Null/Empty column headers detected in file: {file_name}")
-                        invalid_null_header_files.append(file_name)  # Add file with null headers to the list
+                        logger.warning(f"Null/Empty column headers detected in file: {file_name}")
+                        logger.debug(f"Null/Empty column headers detected in file: {file_name}")
                     else:
-                        logging.error(f"Column headers extracted (negative test failed) in file: {file_name}")
-                        debug_print(f"Column headers extracted (negative test failed) in file: {file_name}")
+                        logger.warning(f"Column headers extracted (negative test failed) in file: {file_name}")
+                        logger.debug(f"Column headers extracted (negative test failed) in file: {file_name}")
                     
-            except Exception as e:
-                logging.error(f"Error processing file {file_name}: {e}")
-                debug_print(f"Error processing file {file_name}: {e}")
-                invalid_null_header_files.append(file_name)  # Add file to the list in case of errors
-
-    logging.info("Negative test case for null column headers completed")
-    return invalid_null_header_files
+                except Exception as e:
+                    logger.error(f"Error processing file {file_name}: {e}")
+                    logger.debug(f"Error processing file {file_name}: {e}")
+    
 
 
-if __name__ == "__main__":
-    pytest.main([__file__])
-
-    # After the test run, open and print the log file contents
-    with open(log_file, 'r') as f:
-        print(f.read())
+pytest.main([__file__])
+with open(log_file, 'r') as f:
+    print(f.read())
