@@ -58,7 +58,7 @@ from configparser import ConfigParser
 from user_Interface import user_interface
 
 from data_extraction import debug_print
-import logging
+import logging1
 
 # Read config.ini file
 config_object = ConfigParser()
