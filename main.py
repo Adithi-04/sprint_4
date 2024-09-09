@@ -73,7 +73,7 @@ Log_files = config_object['LOG FILE DETAILS']
 RTF_Style_Tags = config_object['RTF STYLE TAGS']
 
 try:
-    user_interface(logging.write_exceptions, RTF_tags)
+    user_interface(logging1.write_exceptions, RTF_tags)
   
 except ImportError as e:
     debug_print("UI unsuccessful")
